@@ -37,7 +37,9 @@ func NewUser() *User {
 func (m *User) Save(tx *dbr.Tx) error {
 
 	_, err := tx.InsertInto("sys_users").
-		//Columns("number", "name", "position", "created_at").
+		Columns("user_type", "login_type", "username", "password",
+				"openid","active","nickname","face","gender","age",
+				"phone","email","qq","weixin","created_at").
 		Record(m).
 		Exec()
 
@@ -52,11 +54,11 @@ func (m *User) Load(tx *dbr.Tx, id int64) error {
 		LoadStruct(m)
 }
 
-func (m *User) LoadBy(tx *dbr.Tx, nv []string) error {
+func (m *User) LoadByUsername(tx *dbr.Tx, value string) error {
 
 	return tx.Select("*").
 		From("sys_users").
-		Where(nv[0]+" = ?", nv[1]).
+		Where("username = ?", value).
 		LoadStruct(m)
 }
 
