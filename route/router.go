@@ -22,12 +22,7 @@ func Init() *echo.Echo {
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAcceptEncoding},
 	}))
-	e.Use(echoMw.JWT([]byte("secret")))
-	// 自定义
-	//e.Use(echoMw.JWTWithConfig(echoMw.JWTConfig{
-	//	SigningKey: []byte("secret"),
-	//	TokenLookup: "query:token",
-	//}))
+	//e.Use(echoMw.JWT([]byte("secret")))
 
 	e.HTTPErrorHandler  = handler.JSONHTTPErrorHandler
 	//e.SetHTTPErrorHandler(handler.JSONHTTPErrorHandler)
@@ -39,6 +34,7 @@ func Init() *echo.Echo {
 	v1 := e.Group("/api")
 	{
 		v1.POST("/login", api.Login())
+		v1.POST("/register", api.Register())
 		v1.GET("/user/:id", api.GetUser())
 		v1.GET("/users/:active", api.GetUsers())
 	}

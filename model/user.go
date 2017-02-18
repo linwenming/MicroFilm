@@ -52,6 +52,14 @@ func (m *User) Load(tx *dbr.Tx, id int64) error {
 		LoadStruct(m)
 }
 
+func (m *User) LoadBy(tx *dbr.Tx, nv []string) error {
+
+	return tx.Select("*").
+		From("sys_users").
+		Where(nv[0]+" = ?", nv[1]).
+		LoadStruct(m)
+}
+
 type Users []User
 
 func (m *Users) Load(tx *dbr.Tx, active int) error {
