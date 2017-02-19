@@ -10,6 +10,8 @@ import (
 	"github.com/valyala/fasthttp"
 	"strings"
 	"fmt"
+	jwt "github.com/dgrijalva/jwt-go"
+	"time"
 )
 
 func Login() echo.HandlerFunc {
@@ -32,7 +34,10 @@ func Login() echo.HandlerFunc {
 
 		if err := user.LoadByUsername(tx, username); err != nil {
 			logrus.Debug(err)
-			return echo.NewHTTPError(fasthttp.StatusInternalServerError,"服务器内部错误")
+			return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+				"code":102,
+				"msg":"用户未注册.",
+			})
 		}
 
 		if !strings.EqualFold(user.Password, password) {
@@ -42,9 +47,25 @@ func Login() echo.HandlerFunc {
 			})
 		}
 
+		// Create token
+		token := jwt.New(jwt.SigningMethodHS256)
+
+		// Set claims
+		claims := token.Claims.(jwt.MapClaims)
+		claims["name"] = username
+		claims["admin"] = true
+		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+		// Generate encoded token and send it as response.
+		t, err := token.SignedString([]byte("secret"))
+		if err != nil {
+			return echo.ErrUnauthorized
+		}
+
 		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
 			"code":0,
 			"msg":"登录成功.",
+			"data":map[string]interface{}{"token":t},
 		})
 	}
 }
@@ -73,7 +94,27 @@ func Register() echo.HandlerFunc {
 			logrus.Debug(err)
 			return echo.NewHTTPError(fasthttp.StatusInternalServerError)
 		}
-		return c.JSON(fasthttp.StatusOK, user)
+
+		// Create token
+		token := jwt.New(jwt.SigningMethodHS256)
+
+		// Set claims
+		claims := token.Claims.(jwt.MapClaims)
+		claims["name"] = m.Username
+		claims["admin"] = true
+		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+		// Generate encoded token and send it as response.
+		t, err := token.SignedString([]byte("secret"))
+		if err != nil {
+			return echo.ErrUnauthorized
+		}
+
+		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+			"code":0,
+			"msg":"注册成功.",
+			"data":map[string]interface{}{"token":t},
+		})
 	}
 }
 

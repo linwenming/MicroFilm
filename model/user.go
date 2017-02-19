@@ -37,9 +37,7 @@ func NewUser() *User {
 func (m *User) Save(tx *dbr.Tx) error {
 
 	_, err := tx.InsertInto("sys_users").
-		Columns("user_type", "login_type", "username", "password",
-				"openid","active","nickname","face","gender","age",
-				"phone","email","qq","weixin","created_at").
+		Columns(BuildColumnName(m)...).
 		Record(m).
 		Exec()
 

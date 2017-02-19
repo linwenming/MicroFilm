@@ -7,6 +7,9 @@ import (
 	echoMw "github.com/labstack/echo/middleware"
 	"github.com/labstack/echo"
 	"MicroFilm/handler"
+	"github.com/dgrijalva/jwt-go"
+	"net/http"
+	"fmt"
 )
 
 func Init() *echo.Echo {
@@ -30,13 +33,23 @@ func Init() *echo.Echo {
 	// Set Custom MiddleWare
 	e.Use(currMw.TransactionHandler(db.Init()))
 
+	e.POST("/login", api.Login())
+	e.POST("/register", api.Register())
+
 	// Routes
 	v1 := e.Group("/api")
 	{
-		v1.POST("/login", api.Login())
-		v1.POST("/register", api.Register())
+		v1.GET("/", restricted)
 		v1.GET("/user/:id", api.GetUser())
 		v1.GET("/users/:active", api.GetUsers())
 	}
 	return e
+}
+
+func restricted(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["name"].(string)
+	fmt.Println("user name:" + name)
+	return c.String(http.StatusOK, "Welcome "+name+"!")
 }
