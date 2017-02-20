@@ -1,17 +1,17 @@
 package api
 
 import (
-	"strconv"
 
 	"github.com/Sirupsen/logrus"
-	"MicroFilm/model"
 	"github.com/gocraft/dbr"
 	"github.com/labstack/echo"
 	"github.com/valyala/fasthttp"
+	jwt "github.com/dgrijalva/jwt-go"
 	"strings"
 	"fmt"
-	jwt "github.com/dgrijalva/jwt-go"
 	"time"
+	"strconv"
+	"MicroFilm/model"
 )
 
 func Login() echo.HandlerFunc {
@@ -81,7 +81,7 @@ func Register() echo.HandlerFunc {
 		user := new(model.User)
 		user.LoadByUsername(tx,m.Username)
 
-		fmt.Printf("username:%s  db username:%s",m.Username,user.Username + "\n")
+		//fmt.Printf("username:%s  db username:%s",m.Username,user.Username + "\n")
 
 		if strings.EqualFold(m.Username,user.Username) {
 			return c.JSON(fasthttp.StatusOK, map[string]interface{}{
@@ -101,7 +101,7 @@ func Register() echo.HandlerFunc {
 		// Set claims
 		claims := token.Claims.(jwt.MapClaims)
 		claims["name"] = m.Username
-		claims["admin"] = true
+		//claims["admin"] = true
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 		// Generate encoded token and send it as response.

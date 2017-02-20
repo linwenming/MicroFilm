@@ -7,9 +7,6 @@ import (
 	echoMw "github.com/labstack/echo/middleware"
 	"github.com/labstack/echo"
 	"MicroFilm/handler"
-	"github.com/dgrijalva/jwt-go"
-	"net/http"
-	"fmt"
 )
 
 func Init() *echo.Echo {
@@ -25,7 +22,6 @@ func Init() *echo.Echo {
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAcceptEncoding},
 	}))
-	//e.Use(echoMw.JWT([]byte("secret")))
 
 	e.HTTPErrorHandler  = handler.JSONHTTPErrorHandler
 	//e.SetHTTPErrorHandler(handler.JSONHTTPErrorHandler)
@@ -37,19 +33,21 @@ func Init() *echo.Echo {
 	e.POST("/register", api.Register())
 
 	// Routes
-	v1 := e.Group("/api")
+	v1 := e.Group("/api",currMw.AuthroizationHandler())
 	{
-		v1.GET("/", restricted)
 		v1.GET("/user/:id", api.GetUser())
 		v1.GET("/users/:active", api.GetUsers())
 	}
+	v1.Use(echoMw.JWT([]byte("secret")))
+	//v1.Use(echoMw.JWTWithConfig(echoMw.JWTConfig{
+	//	Skipper:       func(echo.Context) bool { return false },
+	//	SigningMethod: echoMw.AlgorithmHS256,
+	//	ContextKey:    "user",
+	//	TokenLookup:   "header:" + echo.HeaderAuthorization,
+	//	SigningKey:    []byte("secret"),
+	//	AuthScheme:    "Bearer",
+	//}))
 	return e
 }
 
-func restricted(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	name := claims["name"].(string)
-	fmt.Println("user name:" + name)
-	return c.String(http.StatusOK, "Welcome "+name+"!")
-}
+
