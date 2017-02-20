@@ -6,6 +6,7 @@
 # Folders
 _obj
 _test
+.idea/workspace.xml
 
 # Architecture specific extensions/prefixes
 *.[568vq]
