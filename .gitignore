@@ -6,7 +6,12 @@
 # Folders
 _obj
 _test
+
+### IntelliJ IDEA ###
 .idea
+*.iws
+*.iml
+*.ipr
 
 # Architecture specific extensions/prefixes
 *.[568vq]
