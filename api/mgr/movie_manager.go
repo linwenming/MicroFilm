@@ -33,7 +33,25 @@ func EditMovieOfBaseInfo() echo.HandlerFunc {
 	}
 }
 
-func GetUnactivedMovies() echo.HandlerFunc {
+func GetMovies() echo.HandlerFunc {
+	return func(c echo.Context) (err error) {
+		section := c.QueryParam("section");
+		fmt.Printf("section:%s", section)
+
+		return c.JSON(fasthttp.StatusOK, interface{}("test"))
+	}
+}
+
+func UpOrDownMovie() echo.HandlerFunc {
+	return func(c echo.Context) (err error) {
+		section := c.QueryParam("section");
+		fmt.Printf("section:%s", section)
+
+		return c.JSON(fasthttp.StatusOK, interface{}("test"))
+	}
+}
+
+func GetMoviesBy() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		section := c.QueryParam("section");
 		fmt.Printf("section:%s", section)
