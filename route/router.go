@@ -7,6 +7,7 @@ import (
 	echoMw "github.com/labstack/echo/middleware"
 	"github.com/labstack/echo"
 	"MicroFilm/handler"
+	"MicroFilm/api/mgr"
 )
 
 func Init() *echo.Echo {
@@ -37,6 +38,8 @@ func Init() *echo.Echo {
 	{
 		v1.GET("/user/:id", api.GetUser())
 		v1.GET("/users/:active", api.GetUsers())
+
+		v1.POST("/mgr/uploadfile", mgr.UploadMovieFile())
 	}
 	v1.Use(echoMw.JWT([]byte("secret")))
 	//v1.Use(echoMw.JWTWithConfig(echoMw.JWTConfig{

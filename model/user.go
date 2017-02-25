@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gocraft/dbr"
+	"MicroFilm/util"
 )
 
 type User struct {
@@ -37,7 +38,7 @@ func NewUser() *User {
 func (m *User) Save(tx *dbr.Tx) error {
 
 	_, err := tx.InsertInto("sys_users").
-		Columns(BuildColumnName(m)...).
+		Columns(util.BuildColumnName(m)...).
 		Record(m).
 		Exec()
 
