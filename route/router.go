@@ -1,13 +1,13 @@
 package route
 
 import (
-	"MicroFilm/api"
 	"MicroFilm/db"
 	currMw "MicroFilm/middleware"
 	echoMw "github.com/labstack/echo/middleware"
 	"github.com/labstack/echo"
 	"MicroFilm/handler"
 	"MicroFilm/api/mgr"
+	"MicroFilm/api/safe"
 )
 
 func Init() *echo.Echo {
@@ -30,18 +30,27 @@ func Init() *echo.Echo {
 	// Set Custom MiddleWare
 	e.Use(currMw.TransactionHandler(db.Init()))
 
-	e.POST("/login", api.Login())
-	e.POST("/register", api.Register())
+	e.POST("/login", safe.Login())
+	e.POST("/register", safe.Register())
 
 	// Routes
-	v1 := e.Group("/api",currMw.AuthroizationHandler())
+	app := e.Group("/app",currMw.AuthroizationHandler())
 	{
-		v1.GET("/user/:id", api.GetUser())
-		v1.GET("/users/:active", api.GetUsers())
-
-		v1.POST("/mgr/uploadfile", mgr.UploadMovieFile())
+		//api.GET("/user/:id", sa.GetUser())
 	}
-	v1.Use(echoMw.JWT([]byte("secret")))
+	app.Use(echoMw.JWT([]byte("secret")))
+
+	manage := e.Group("/mgr",currMw.AuthroizationHandler())
+	{
+		manage.POST("/movie/uploadvideo", mgr.UploadMovieFile())
+		manage.POST("/movie", mgr.AddMovie())
+		manage.PUT("/movie", mgr.EditBaseInfoOfMovie())
+		manage.PATCH("/movie", mgr.EditSpecialOfMovie())
+		manage.GET("/movie/:id", mgr.GetMovieById())
+
+	}
+	manage.Use(echoMw.JWT([]byte("secret")))
+
 	//v1.Use(echoMw.JWTWithConfig(echoMw.JWTConfig{
 	//	Skipper:       func(echo.Context) bool { return false },
 	//	SigningMethod: echoMw.AlgorithmHS256,

@@ -5,7 +5,59 @@ import (
 	"unicode"
 	"bytes"
 	"strings"
+	"database/sql/driver"
 )
+
+func StructMap(value interface{}) map[string]interface{} {
+
+	v := reflect.Indirect(reflect.ValueOf(value))
+	m := make(map[string]interface{})
+
+	structValue(m,v)
+
+	return m
+}
+
+var (
+	typeValuer = reflect.TypeOf((*driver.Valuer)(nil)).Elem()
+)
+
+func structValue(m map[string]interface{}, value reflect.Value) {
+	if value.Type().Implements(typeValuer) {
+		return
+	}
+	switch value.Kind() {
+	case reflect.Ptr:
+		if value.IsNil() {
+			return
+		}
+		structValue(m, value.Elem())
+	case reflect.Struct:
+		t := value.Type()
+		for i := 0; i < t.NumField(); i++ {
+			field := t.Field(i)
+			if field.PkgPath != "" && !field.Anonymous {
+				// unexported
+				continue
+			}
+
+			tag := field.Tag.Get("db")
+			if tag == "-" {
+				// ignore
+				continue
+			}
+			if tag == "" {
+				// no tag, but we can record the field name
+				tag = camelCaseToSnakeCase(field.Name)
+			}
+			fieldValue := value.Field(i)
+			if _, ok := m[tag]; !ok {
+				m[tag] = fieldValue.Interface()
+			}
+			structValue(m, fieldValue)
+		}
+	}
+}
 
 // 提取结构中的db属性
 func BuildColumnName(m interface{}) []string{
