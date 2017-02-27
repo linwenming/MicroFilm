@@ -3,7 +3,6 @@ package mgr
 import (
 	"github.com/labstack/echo"
 	"github.com/valyala/fasthttp"
-	"fmt"
 	"os"
 	"io"
 	"MicroFilm/conf"
@@ -13,7 +12,7 @@ import (
 	"strconv"
 )
 
-func UploadMovieFile() echo.HandlerFunc {
+func Movie_upload() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
 		//videoname := c.FormValue("name")
@@ -55,7 +54,7 @@ func UploadMovieFile() echo.HandlerFunc {
 	}
 }
 
-func AddMovie() echo.HandlerFunc {
+func Movie_add() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
 		m := model.NewMovieForm()
@@ -65,7 +64,7 @@ func AddMovie() echo.HandlerFunc {
 
 		if err := m.Save(tx); err != nil {
 			logrus.Debug(err)
-			return echo.NewHTTPError(fasthttp.StatusInternalServerError)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError,err.Error())
 		}
 
 		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
@@ -75,7 +74,28 @@ func AddMovie() echo.HandlerFunc {
 	}
 }
 
-func GetMovieById() echo.HandlerFunc {
+func Movie_del() echo.HandlerFunc {
+	return func(c echo.Context) (err error) {
+
+		id,_ := strconv.ParseInt(c.FormValue("id"),10,64);
+
+		m := model.NewMovieForm()
+
+		tx := c.Get("Tx").(*dbr.Tx)
+
+		if err := m.Delete(tx,id); err != nil {
+			logrus.Debug(err)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError,err.Error())
+		}
+
+		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+			"code":0,
+			"msg":"successful.",
+		})
+	}
+}
+
+func Movie_loadById() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
@@ -91,7 +111,8 @@ func GetMovieById() echo.HandlerFunc {
 	}
 }
 
-func EditBaseInfoOfMovie() echo.HandlerFunc {
+// 修改基本属性
+func Movie_editBaseInfo() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
 		m := model.NewMovieForm()
@@ -103,7 +124,7 @@ func EditBaseInfoOfMovie() echo.HandlerFunc {
 
 		if err := m.Update(tx); err != nil {
 			logrus.Debug(err)
-			return echo.NewHTTPError(fasthttp.StatusInternalServerError)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError,err.Error())
 		}
 
 		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
@@ -113,8 +134,8 @@ func EditBaseInfoOfMovie() echo.HandlerFunc {
 	}
 }
 
-// 特殊属性
-func EditSpecialOfMovie() echo.HandlerFunc {
+// 修改统计属性
+func Movie_editStatistics() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		id,_ := strconv.ParseInt(c.FormValue("id"),10,64);
 		score,_ := strconv.ParseInt(c.FormValue("score"),10,64);
@@ -143,7 +164,7 @@ func EditSpecialOfMovie() echo.HandlerFunc {
 
 		if err := m.UpdateBy(tx, value); err != nil {
 			logrus.Debug(err)
-			return echo.NewHTTPError(fasthttp.StatusInternalServerError)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError,err.Error())
 		}
 
 		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
@@ -153,20 +174,26 @@ func EditSpecialOfMovie() echo.HandlerFunc {
 	}
 }
 
-func UpOrDownMovie() echo.HandlerFunc {
+// 修改影片的状态
+func Movie_updateStatus() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
-		section := c.QueryParam("section");
-		fmt.Printf("section:%s", section)
+		id,_ := strconv.ParseInt(c.QueryParam("id"),10,64);
+		status,_ := strconv.ParseInt(c.QueryParam("status"),10,64);
 
-		return c.JSON(fasthttp.StatusOK, interface{}("test"))
+		m := model.NewMovieForm();
+		m.Id = id
+
+		tx := c.Get("Tx").(*dbr.Tx)
+
+		if err := m.UpdateBy(tx, map[string]interface{}{"status":status}); err != nil {
+			logrus.Debug(err)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError,err.Error())
+		}
+
+		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+			"code":0,
+			"msg":"successful.",
+		})
 	}
 }
 
-func GetMoviesBy() echo.HandlerFunc {
-	return func(c echo.Context) (err error) {
-		section := c.QueryParam("section");
-		fmt.Printf("section:%s", section)
-
-		return c.JSON(fasthttp.StatusOK, interface{}("test"))
-	}
-}

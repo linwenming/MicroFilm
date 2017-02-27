@@ -51,6 +51,15 @@ func (m *MovieForm) Save(tx *dbr.Tx) error {
 	return err
 }
 
+func (m *MovieForm) Delete(tx *dbr.Tx, id int64) error {
+
+	_, err := tx.DeleteFrom("mv_film").
+		Where("id = ?", id).
+		Exec()
+
+	return err
+}
+
 func (m *MovieForm) Update(tx *dbr.Tx) error {
 
 	_, err := tx.Update("mv_film").

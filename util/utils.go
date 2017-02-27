@@ -109,5 +109,13 @@ func camelCaseToSnakeCase(name string) string {
 }
 
 
-
+func NextBillNumber() {
+	//http://www.freeyii.com/news/172.html
+	//订单号常见的几种方式：
+	//1.利用数据库主键值产生一个自增长的订单号（订单号即数据表的主键）
+	//2.日期+自增长数字的订单号（比如：2012040110235662）
+	//3.产生随机的订单号(65865325365966)
+	//4.字母+数字字符串式，字母有包含特别意义，C02356652
+	//SELECT auto_increment FROM information_schema.`TABLES` WHERE TABLE_SCHEMA='micro_movie' AND TABLE_NAME='mv_category';
+}
 

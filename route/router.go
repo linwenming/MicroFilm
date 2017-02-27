@@ -42,11 +42,19 @@ func Init() *echo.Echo {
 
 	manage := e.Group("/mgr",currMw.AuthroizationHandler())
 	{
-		manage.POST("/movie/uploadvideo", mgr.UploadMovieFile())
-		manage.POST("/movie", mgr.AddMovie())
-		manage.PUT("/movie", mgr.EditBaseInfoOfMovie())
-		manage.PATCH("/movie", mgr.EditSpecialOfMovie())
-		manage.GET("/movie/:id", mgr.GetMovieById())
+		manage.POST("/movie/uploadvideo", mgr.Movie_upload())
+		manage.POST("/movie", mgr.Movie_add())
+		manage.DELETE("/movie/:id", mgr.Movie_del())
+		manage.PUT("/movie", mgr.Movie_editBaseInfo())
+		manage.PATCH("/movie/statistics", mgr.Movie_editStatistics())
+		manage.GET("/movie/:id", mgr.Movie_loadById())
+		manage.GET("/movie/status", mgr.Movie_updateStatus())
+
+		manage.POST("/cate", mgr.Cate_add())
+		manage.DELETE("/cate/:id", mgr.Cate_del())
+		manage.PUT("/cate", mgr.Cate_edit())
+		manage.GET("/cate/:id", mgr.Cate_loadById())
+		manage.GET("/cate/list", mgr.Cate_list())
 
 	}
 	manage.Use(echoMw.JWT([]byte("secret")))
