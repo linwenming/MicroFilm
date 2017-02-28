@@ -12,11 +12,6 @@ type Category struct {
 	Level  int64    `json:"level"`
 }
 
-func NextBillNumber() {
-
-}
-
-
 func (m *Category) Save(tx *dbr.Tx) error {
 
 	_, err := tx.InsertInto("mv_category").

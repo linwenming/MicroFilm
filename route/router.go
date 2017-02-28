@@ -56,6 +56,12 @@ func Init() *echo.Echo {
 		manage.GET("/cate/:id", mgr.Cate_loadById())
 		manage.GET("/cate/list", mgr.Cate_list())
 
+		manage.POST("/order", mgr.Order_create())
+		//manage.DELETE("/order/:id", mgr.Cate_del())
+		//manage.PUT("/order", mgr.Cate_edit())
+		//manage.GET("/order/:id", mgr.Cate_loadById())
+		//manage.GET("/order/list", mgr.Cate_list())
+
 	}
 	manage.Use(echoMw.JWT([]byte("secret")))
 
