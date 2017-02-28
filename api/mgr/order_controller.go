@@ -8,9 +8,6 @@ import (
 	"MicroFilm/model"
 )
 
-/**
- * 创建订单
- */
 func Order_create() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 

@@ -46,7 +46,7 @@ func Init() *echo.Echo {
 		manage.POST("/movie", mgr.Movie_add())
 		manage.DELETE("/movie/:id", mgr.Movie_del())
 		manage.PUT("/movie", mgr.Movie_editBaseInfo())
-		manage.PATCH("/movie/statistics", mgr.Movie_editStatistics())
+		manage.PATCH("/movie/statprop", mgr.Movie_editStatProperty())
 		manage.GET("/movie/:id", mgr.Movie_loadById())
 		manage.GET("/movie/status", mgr.Movie_updateStatus())
 

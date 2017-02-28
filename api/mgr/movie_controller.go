@@ -135,7 +135,7 @@ func Movie_editBaseInfo() echo.HandlerFunc {
 }
 
 // 修改统计属性
-func Movie_editStatistics() echo.HandlerFunc {
+func Movie_editStatProperty() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		id,_ := strconv.ParseInt(c.FormValue("id"),10,64);
 		score,_ := strconv.ParseInt(c.FormValue("score"),10,64);
