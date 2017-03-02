@@ -69,3 +69,31 @@ func NextBillNumber(tx *dbr.Tx) (string, error) {
 		return "", err
 	}
 }
+
+func (m *OrderDetail) LoadBySn(tx *dbr.Tx, sn string) error {
+
+	return tx.Select(util.BuildColumnName(m)...).
+		From("bis_order").
+		Where("orderSn = ?", sn).
+		LoadStruct(m)
+}
+
+func (m *OrderDetail) UpdateBy(tx *dbr.Tx, value map[string]interface{}) error {
+
+	_, err := tx.Update("bis_order").
+		SetMap(value).
+		Where("id = ?", m.Id).
+		Exec()
+
+	return err
+}
+
+type OrderDetails []OrderDetail
+
+func (m *OrderDetails) Load(tx *dbr.Tx, pageSize int64, pageNumber int64) error {
+
+	return tx.Select("*").
+		From("bis_order").
+		Limit(pageSize).Offset((pageNumber - 1) * pageSize).
+		LoadStruct(m)
+}

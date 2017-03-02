@@ -57,8 +57,9 @@ func Init() *echo.Echo {
 		manage.GET("/cate/list", mgr.Cate_list())
 
 		manage.POST("/order", mgr.Order_create())
-		//manage.DELETE("/order/:id", mgr.Cate_del())
-		//manage.PUT("/order", mgr.Cate_edit())
+		manage.GET("/order/callback", mgr.Order_paymentCallback())
+		manage.GET("/order/sn/:orderSn", mgr.Order_getBySn())
+		manage.GET("/order/list", mgr.Order_list())
 		//manage.GET("/order/:id", mgr.Cate_loadById())
 		//manage.GET("/order/list", mgr.Cate_list())
 
