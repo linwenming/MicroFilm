@@ -50,8 +50,9 @@ func Login() echo.HandlerFunc {
 
 		// Set claims
 		claims := token.Claims.(jwt.MapClaims)
-		claims["name"] = username
-		//claims["admin"] = false
+		claims["uid"] = user.Id
+		claims["name"] = user.Username
+		claims["admin"] = false
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 		// Generate encoded token and send it as response.
@@ -98,6 +99,7 @@ func Register() echo.HandlerFunc {
 
 		// Set claims
 		claims := token.Claims.(jwt.MapClaims)
+		claims["uid"] = m.Id
 		claims["name"] = m.Username
 		claims["admin"] = false
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()

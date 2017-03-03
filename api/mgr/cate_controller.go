@@ -7,6 +7,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"MicroFilm/model"
 	"strconv"
+	"github.com/patrickmn/go-cache"
 )
 
 func Cate_add() echo.HandlerFunc {
@@ -90,14 +91,17 @@ func Cate_loadById() echo.HandlerFunc {
 func Cate_list() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
-		tx := c.Get("Tx").(*dbr.Tx)
+		//tx := c.Get("Tx").(*dbr.Tx)
+		//
+		//var list model.CategoryList
+		//
+		//if err := list.Load(tx); err != nil {
+		//	logrus.Debug(err)
+		//	return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
+		//}
 
-		var list model.CategoryList
-
-		if err := list.Load(tx); err != nil {
-			logrus.Debug(err)
-			return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
-		}
+		cache := c.Get("Cache").(*cache.Cache)
+		list,_ := cache.Get("CateList")
 
 		return c.JSON(fasthttp.StatusOK, list)
 	}

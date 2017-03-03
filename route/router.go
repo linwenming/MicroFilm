@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo"
 	"MicroFilm/handler"
 	"MicroFilm/api/mgr"
+	"MicroFilm/api/app"
 	"MicroFilm/api/safe"
 )
 
@@ -24,47 +25,54 @@ func Init() *echo.Echo {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAcceptEncoding},
 	}))
 
-	e.HTTPErrorHandler  = handler.JSONHTTPErrorHandler
+	e.HTTPErrorHandler = handler.JSONHTTPErrorHandler
 	//e.SetHTTPErrorHandler(handler.JSONHTTPErrorHandler)
 
-	// Set Custom MiddleWare
+	// Set customer MiddleWare
 	e.Use(currMw.TransactionHandler(db.Init()))
+	e.Use(currMw.DataCacheHandler())
 
 	e.POST("/login", safe.Login())
 	e.POST("/register", safe.Register())
 
 	// Routes
-	app := e.Group("/app",currMw.AuthroizationHandler())
+	_app := e.Group("/app", currMw.AuthroizationHandler())
 	{
-		//api.GET("/user/:id", sa.GetUser())
+		_app.GET("/movie/list", app.Movie_listByCate())
+		_app.GET("/movie/:mid", app.Movie_listByCate())
+		_app.GET("/movie/zan", app.Movie_zan())
+
+		_app.GET("/comment/list", app.Comment_list())
+		_app.POST("/comment/reply", app.Comment_reply())
+		_app.GET("/comment/zan", app.Comment_zan())
 	}
-	app.Use(echoMw.JWT([]byte("secret")))
+	_app.Use(echoMw.JWT([]byte("secret")))
 
-	manage := e.Group("/mgr",currMw.AuthroizationHandler())
+	_mgr := e.Group("/mgr", currMw.AuthroizationHandler())
 	{
-		manage.POST("/movie/uploadvideo", mgr.Movie_upload())
-		manage.POST("/movie", mgr.Movie_add())
-		manage.DELETE("/movie/:id", mgr.Movie_del())
-		manage.PUT("/movie", mgr.Movie_editBaseInfo())
-		manage.PATCH("/movie/statprop", mgr.Movie_editStatProperty())
-		manage.GET("/movie/:id", mgr.Movie_loadById())
-		manage.GET("/movie/status", mgr.Movie_updateStatus())
+		_mgr.POST("/movie/uploadvideo", mgr.Movie_upload())
+		_mgr.POST("/movie", mgr.Movie_add())
+		_mgr.DELETE("/movie/:id", mgr.Movie_del())
+		_mgr.PUT("/movie", mgr.Movie_editBaseInfo())
+		_mgr.PATCH("/movie/statprop", mgr.Movie_editStatProperty())
+		_mgr.GET("/movie/:id", mgr.Movie_loadById())
+		_mgr.GET("/movie/status", mgr.Movie_updateStatus())
 
-		manage.POST("/cate", mgr.Cate_add())
-		manage.DELETE("/cate/:id", mgr.Cate_del())
-		manage.PUT("/cate", mgr.Cate_edit())
-		manage.GET("/cate/:id", mgr.Cate_loadById())
-		manage.GET("/cate/list", mgr.Cate_list())
+		_mgr.POST("/cate", mgr.Cate_add())
+		_mgr.DELETE("/cate/:id", mgr.Cate_del())
+		_mgr.PUT("/cate", mgr.Cate_edit())
+		_mgr.GET("/cate/:id", mgr.Cate_loadById())
+		_mgr.GET("/cate/list", mgr.Cate_list())
 
-		manage.POST("/order", mgr.Order_create())
-		manage.GET("/order/callback", mgr.Order_paymentCallback())
-		manage.GET("/order/sn/:orderSn", mgr.Order_getBySn())
-		manage.GET("/order/list", mgr.Order_list())
+		_mgr.POST("/order", mgr.Order_create())
+		_mgr.GET("/order/callback", mgr.Order_paymentCallback())
+		_mgr.GET("/order/sn/:orderSn", mgr.Order_getBySn())
+		_mgr.GET("/order/list", mgr.Order_list())
 		//manage.GET("/order/:id", mgr.Cate_loadById())
 		//manage.GET("/order/list", mgr.Cate_list())
 
 	}
-	manage.Use(echoMw.JWT([]byte("secret")))
+	_mgr.Use(echoMw.JWT([]byte("secret")))
 
 	//v1.Use(echoMw.JWTWithConfig(echoMw.JWTConfig{
 	//	Skipper:       func(echo.Context) bool { return false },

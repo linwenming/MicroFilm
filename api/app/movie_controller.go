@@ -7,45 +7,58 @@ import (
 	"github.com/valyala/fasthttp"
 	//"strconv"
 	"fmt"
+	"strconv"
+	"github.com/gocraft/dbr"
+	"github.com/Sirupsen/logrus"
+	"MicroFilm/model"
 )
 
-func GetMoviesBySection() echo.HandlerFunc {
+func Movie_listByCate() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
-		section := c.QueryParam("section");
-		fmt.Printf("section:%s", section)
 
-		return c.JSON(fasthttp.StatusOK, interface{}("test"))
+		cateId, _ := strconv.ParseInt(c.QueryParam("cateId"), 10, 64)
+		logrus.Debug("根据分类查询电影: ", cateId)
+
+		tx := c.Get("Tx").(*dbr.Tx)
+
+		var movies model.Movies
+		if err := movies.LoadByCate(tx, cateId); err != nil {
+			logrus.Debug(err)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+			"code":0,
+			"msg":"successful.",
+			"data":movies,
+		})
 	}
 }
 
-func GetMoviesByCategory() echo.HandlerFunc {
+func Movie_getDetail() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
-		category_id := c.QueryParam("category_id");
-		fmt.Printf("category_id:%s", category_id)
 
-		return c.JSON(fasthttp.StatusOK, interface{}("test"))
+		mid, _ := strconv.ParseInt(c.QueryParam("mid"), 10, 64)
+		logrus.Debug("查询电影详情: ", mid)
+
+		tx := c.Get("Tx").(*dbr.Tx)
+
+		var movie model.Movie
+		if err := movie.Load(tx, mid); err != nil {
+			logrus.Debug(err)
+			return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
+		}
+
+		return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+			"code":0,
+			"msg":"successful.",
+			"data":movie,
+		})
 	}
 }
 
-func GetMoviesByTags() echo.HandlerFunc {
-	return func(c echo.Context) (err error) {
-		tags := c.QueryParam("tags");
-		fmt.Printf("tags:%s", tags)
-
-		return c.JSON(fasthttp.StatusOK, interface{}("test"))
-	}
-}
-
-func GetMovieDetail() echo.HandlerFunc {
-	return func(c echo.Context) (err error) {
-		id := c.QueryParam("mid");
-		fmt.Printf("id:%d", id)
-
-		return c.JSON(fasthttp.StatusOK, interface{}("test"))
-	}
-}
-
-func ZanMovie() echo.HandlerFunc {
+// 点赞
+func Movie_zan() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		id := c.QueryParam("mid");
 		fmt.Printf("id:%d", id)
@@ -58,7 +71,7 @@ func PlayAuthorized() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 		uid := c.QueryParam("uid");
 		mid := c.QueryParam("mid");
-		fmt.Printf("uid:%d  mid:%d", uid,mid)
+		fmt.Printf("uid:%d  mid:%d", uid, mid)
 
 		return c.JSON(fasthttp.StatusOK, interface{}("test"))
 	}

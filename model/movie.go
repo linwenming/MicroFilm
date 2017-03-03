@@ -87,3 +87,21 @@ func (m *MovieForm) Load(tx *dbr.Tx, id int64) error {
 		Where("id = ?", id).
 		LoadStruct(m)
 }
+
+func (m *Movie) Load(tx *dbr.Tx, id int64) error {
+
+	return tx.Select(util.BuildColumnName(m)...).
+		From("mv_film").
+		Where("id = ?", id).
+		LoadStruct(m)
+}
+
+type Movies []Movie
+
+func (m *Movies) LoadByCate(tx *dbr.Tx, cateId int64) error {
+
+	return tx.Select(util.BuildColumnName(m)...).
+		From("mv_film").
+		Where("category_id = ?", cateId).
+		LoadStruct(m)
+}

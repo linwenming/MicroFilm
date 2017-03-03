@@ -90,7 +90,7 @@ func (m *OrderDetail) UpdateBy(tx *dbr.Tx, value map[string]interface{}) error {
 
 type OrderDetails []OrderDetail
 
-func (m *OrderDetails) Load(tx *dbr.Tx, pageSize int64, pageNumber int64) error {
+func (m *OrderDetails) Load(tx *dbr.Tx, pageSize uint64, pageNumber uint64) error {
 
 	return tx.Select("*").
 		From("bis_order").

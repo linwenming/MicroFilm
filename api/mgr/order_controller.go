@@ -65,10 +65,10 @@ func Order_paymentCallback() echo.HandlerFunc {
 		orderSn := c.FormValue("orderSn")
 		m := &model.OrderDetail{}
 
-		if(c.FormValue("status") != nil) {
-			m.Status == 2
+		if c.FormValue("status") != "" {
+			m.Status = 2
 		} else {
-			m.Status == 3;
+			m.Status = 3;
 		}
 
 		tx := c.Get("Tx").(*dbr.Tx)
@@ -124,8 +124,8 @@ func Order_getBySn() echo.HandlerFunc {
 func Order_list() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
-		pageSize,NotFound := strconv.ParseInt(c.QueryParam("pageSize"),10,64)
-		pageNumber,_ := strconv.ParseInt(c.QueryParam("pageNumber"),10,64)
+		pageSize,NotFound := strconv.ParseUint(c.QueryParam("pageSize"),10,64)
+		pageNumber,_ := strconv.ParseUint(c.QueryParam("pageNumber"),10,64)
 		if NotFound != nil {
 			pageSize = 10
 		}

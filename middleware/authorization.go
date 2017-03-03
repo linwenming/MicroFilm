@@ -43,6 +43,13 @@ func AuthroizationHandler() echo.MiddlewareFunc {
 
 			fmt.Println("=========authroized end   ===========")
 			//c.Set("User", token.Claims["user"])
+			//uid := claims["uid"].(float64)
+			//name := claims["name"].(string)
+			//admin := claims["admin"].(bool)
+			//exp  := claims["exp"].(float64)
+			//fmt.Printf("Welcome %s uid:%d admin:%t  exp:%d \n",uid,name,admin,exp)
+			claims := token.Claims.(jwt.MapClaims)
+			c.Set("User", claims)
 			return next(c)
 		})
 	}
