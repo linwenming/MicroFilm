@@ -7,7 +7,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"MicroFilm/model"
 	"strconv"
-	"github.com/patrickmn/go-cache"
+	"MicroFilm/middleware"
 )
 
 func Cate_add() echo.HandlerFunc {
@@ -99,9 +99,7 @@ func Cate_list() echo.HandlerFunc {
 		//	logrus.Debug(err)
 		//	return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
 		//}
-
-		cache := c.Get("Cache").(*cache.Cache)
-		list,_ := cache.Get("CateList")
+		list := middleware.CacheCateList(c).(model.CategoryList)
 
 		return c.JSON(fasthttp.StatusOK, list)
 	}

@@ -29,8 +29,9 @@ func Init() *echo.Echo {
 	//e.SetHTTPErrorHandler(handler.JSONHTTPErrorHandler)
 
 	// Set customer MiddleWare
-	e.Use(currMw.TransactionHandler(db.Init()))
-	e.Use(currMw.DataCacheHandler())
+	session := db.Init();
+	e.Use(currMw.TransactionHandler(session))
+	e.Use(currMw.CacheHandler(session))
 
 	e.POST("/login", safe.Login())
 	e.POST("/register", safe.Register())

@@ -14,29 +14,51 @@ const (
 	CateListKey = "CateList"
 )
 
-func DataCacheHandler() echo.MiddlewareFunc {
+func CacheHandler(db *dbr.Session) echo.MiddlewareFunc {
 
 	// 应该定义长久缓存、短期缓存
 	// 创建一个默认的缓存过期时间5分钟,清洗过期物品每30秒
-	_cache := cache.New(12 * time.Hour, 1 * time.Hour)
+	cache := cache.New(12 * time.Hour, 1 * time.Hour)
+	initCacheData(cache, db)
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return echo.HandlerFunc(func(c echo.Context) error {
+		return echo.HandlerFunc(func(ctx echo.Context) error {
 
-			c.Set(CacheKey, _cache)
-
-			_, found := _cache.Get(CateListKey)
-			if !found {
-				tx := c.Get("Tx").(*dbr.Tx)
-				var cateList model.CategoryList
-
-				if err := cateList.Load(tx); err == nil {
-					logrus.Debug("电影分类列表: ",cateList)
-					_cache.Set(CateListKey, cateList, cache.DefaultExpiration)
-				}
-			}
-
-			return next(c)
+			ctx.Set(CacheKey, cache)
+			return next(ctx)
 		})
 	}
+}
+
+// shortcut to get Cache
+//func Default(ctx *echo.Context) cache.Cache {
+//	// return c.MustGet(DefaultKey).(ec.CacheStore)
+//	return ctx.Get(CacheKey).(cache.Cache)
+//}
+
+func CacheCateList(ctx echo.Context) (interface{}) {
+
+	c := ctx.Get(CacheKey).(*cache.Cache)
+
+	list, found := c.Get(CateListKey)
+	if (found) {
+		return list
+	} else {
+		return nil
+	}
+}
+
+func initCacheData(c *cache.Cache, db *dbr.Session) {
+
+	tx, _ := db.Begin()
+
+	var list model.CategoryList
+	if err := list.Load(tx); err != nil {
+		tx.Rollback()
+		logrus.Debug("电影分类列表查询失败")
+	} else {
+		logrus.Debug("电影分类列表: ", list)
+		c.Set(CateListKey, list, cache.DefaultExpiration)
+	}
+	tx.Commit()
 }
