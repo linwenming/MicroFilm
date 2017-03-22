@@ -148,7 +148,7 @@ func ResetPwd() echo.HandlerFunc {
 			result["code"] = 1
 			result["msg"] = "修改失败."
 		}
-		return result
+		return c.JSON(fasthttp.StatusOK, result)
 	}
 }
 

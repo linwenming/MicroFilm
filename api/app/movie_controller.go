@@ -12,6 +12,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"MicroFilm/model"
 	"time"
+	"github.com/dgrijalva/jwt-go"
 )
 
 func Movie_listByCate() echo.HandlerFunc {
@@ -82,9 +83,12 @@ func Movie_getDetail() echo.HandlerFunc {
 
 func Movie_zan() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
-		mid := c.QueryParam("mid");
-		uid := c.QueryParam("uid");
-		fmt.Printf("id:%d", mid)
+		mid,_ := strconv.ParseInt(c.QueryParam("mid"),10,64)
+
+		claims := c.Get("User").(jwt.MapClaims)
+		uid := int64(claims["uid"].(float64))
+
+		fmt.Printf("mid:%d  uid:%d", mid,uid)
 
 		tx := c.Get("Tx").(*dbr.Tx)
 
