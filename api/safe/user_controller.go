@@ -118,6 +118,40 @@ func Register() echo.HandlerFunc {
 	}
 }
 
+func ResetPwd() echo.HandlerFunc {
+	return func(c echo.Context) (err error) {
+
+		username := c.FormValue("username")
+		oldPwd := c.FormValue("oldpwd")
+		newPwd := c.FormValue("newpwd")
+
+		tx := c.Get("Tx").(*dbr.Tx)
+
+		user := &model.User {}
+		dberr := user.LoadByUsername(tx,username)
+
+		if(dberr != nil) {
+			return c.JSON(fasthttp.StatusOK, map[string]interface{}{
+				"code":1,
+				"msg":"账号不存在.",
+			})
+		}
+
+		var result map[string]interface{}
+
+		if(strings.EqualFold(oldPwd,user.Password)) {
+			user.Password =  newPwd;
+			user.Save(tx)
+			result["code"] = 0
+			result["msg"] = "修改成功."
+		} else {
+			result["code"] = 1
+			result["msg"] = "修改失败."
+		}
+		return result
+	}
+}
+
 //func GetUser() echo.HandlerFunc {
 //	return func(c echo.Context) (err error) {
 //

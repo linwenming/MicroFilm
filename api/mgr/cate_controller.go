@@ -99,7 +99,7 @@ func Cate_list() echo.HandlerFunc {
 		//	logrus.Debug(err)
 		//	return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
 		//}
-		list := middleware.CacheCateList(c).(model.CategoryList)
+		list := middleware.CateListFromCache(c).(model.CategoryList)
 
 		return c.JSON(fasthttp.StatusOK, list)
 	}

@@ -35,13 +35,16 @@ func Init() *echo.Echo {
 
 	e.POST("/login", safe.Login())
 	e.POST("/register", safe.Register())
+	e.POST("/resetpwd", safe.ResetPwd())
 
 	// Routes
 	_app := e.Group("/app", currMw.AuthroizationHandler())
 	{
-		_app.GET("/movie/list", app.Movie_listByCate())
-		_app.GET("/movie/:mid", app.Movie_listByCate())
+		_app.GET("/movie/list/cate", app.Movie_listByCate())
+		_app.GET("/movie/list/fuzzy", app.Movie_listByFuzzy())
+		_app.GET("/movie/:mid", app.Movie_getDetail())
 		_app.GET("/movie/zan", app.Movie_zan())
+		_app.GET("/movie/auth", app.Movie_Authorized())
 
 		_app.GET("/comment/list", app.Comment_list())
 		_app.POST("/comment/reply", app.Comment_reply())

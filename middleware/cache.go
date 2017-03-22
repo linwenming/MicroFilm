@@ -36,7 +36,7 @@ func CacheHandler(db *dbr.Session) echo.MiddlewareFunc {
 //	return ctx.Get(CacheKey).(cache.Cache)
 //}
 
-func CacheCateList(ctx echo.Context) (interface{}) {
+func CateListFromCache(ctx echo.Context) (interface{}) {
 
 	c := ctx.Get(CacheKey).(*cache.Cache)
 

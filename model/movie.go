@@ -105,3 +105,11 @@ func (m *Movies) LoadByCate(tx *dbr.Tx, cateId int64) error {
 		Where("category_id = ?", cateId).
 		LoadStruct(m)
 }
+
+func (m *Movies) LoadByFuzzy(tx *dbr.Tx, keyword string) error {
+
+	return tx.Select(util.BuildColumnName(m)...).
+		From("mv_film").
+		Where("CONCAT(`name`,`tags`) LIKE '%?%'", keyword).
+		LoadStruct(m)
+}
