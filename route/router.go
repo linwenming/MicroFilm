@@ -70,10 +70,15 @@ func Init() *echo.Echo {
 
 		_mgr.POST("/order", mgr.Order_create())
 		_mgr.GET("/order/callback", mgr.Order_paymentCallback())
-		_mgr.GET("/order/sn/:orderSn", mgr.Order_getBySn())
+		_mgr.GET("/order/:sn", mgr.Order_getOrderBySn())
 		_mgr.GET("/order/list", mgr.Order_list())
 		//manage.GET("/order/:id", mgr.Cate_loadById())
 		//manage.GET("/order/list", mgr.Cate_list())
+
+		_mgr.GET("/stmt/:id", mgr.Stmt_getSettlement())
+		_mgr.GET("/stmt/list/date", mgr.Stmt_listByDate())
+		_mgr.GET("/stmt/list/page", mgr.Stmt_listByPage())
+		_mgr.GET("/stmt/closed", mgr.Stmt_closed())
 
 	}
 	_mgr.Use(echoMw.JWT([]byte("secret")))

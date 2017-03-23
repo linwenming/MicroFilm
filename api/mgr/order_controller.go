@@ -99,10 +99,10 @@ func Order_paymentCallback() echo.HandlerFunc {
 	}
 }
 
-func Order_getBySn() echo.HandlerFunc {
+func Order_getOrderBySn() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
-		orderSn := c.QueryParam("orderSn")
+		orderSn := c.QueryParam("sn")
 		m := &model.OrderDetail{}
 
 		tx := c.Get("Tx").(*dbr.Tx)
