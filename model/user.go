@@ -45,6 +45,16 @@ func (m *User) Save(tx *dbr.Tx) error {
 	return err
 }
 
+func (m *User) Update(tx *dbr.Tx) error {
+
+	_, err := tx.Update("sys_users").
+		SetMap(util.StructMap(m)).
+		Where("id = ?", m.Id).
+		Exec()
+
+	return err
+}
+
 func (m *User) Load(tx *dbr.Tx, id int64) error {
 
 	return tx.Select("*").

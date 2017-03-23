@@ -137,11 +137,11 @@ func ResetPwd() echo.HandlerFunc {
 			})
 		}
 
-		var result map[string]interface{}
+		result :=  map[string]interface{}{}
 
 		if(strings.EqualFold(oldPwd,user.Password)) {
 			user.Password =  newPwd;
-			user.Save(tx)
+			user.Update(tx)
 			result["code"] = 0
 			result["msg"] = "修改成功."
 		} else {

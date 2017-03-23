@@ -180,7 +180,7 @@ func Movie_updateStatus() echo.HandlerFunc {
 		id,_ := strconv.ParseInt(c.QueryParam("id"),10,64);
 		status,_ := strconv.ParseInt(c.QueryParam("status"),10,64);
 
-		m := model.NewMovieForm();
+		m := model.NewMovie();
 		m.Id = id
 
 		tx := c.Get("Tx").(*dbr.Tx)

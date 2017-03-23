@@ -17,9 +17,8 @@ func Comment_list() echo.HandlerFunc {
 
 		mid, _ := strconv.ParseInt(c.QueryParam("mid"), 10, 64)
 
-		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(jwt.MapClaims)
-		uid := claims["uid"].(int64)
+		claims := c.Get("User").(jwt.MapClaims)
+		uid := int64(claims["uid"].(float64))
 
 		logrus.Debug("根据电影编号查询评论列表: ", mid ,"  uid:",uid)
 

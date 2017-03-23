@@ -50,7 +50,7 @@ type Comments []Comment
 
 func (m *Comments) Load(tx *dbr.Tx, uid int64, mid int64) error {
 
-	return tx.Select(util.BuildColumnName(m)...).
+	return tx.Select(util.BuildColumnName(&Comment{})...).
 		From("mv_comment").
 		Where("uid = ? and mid = ?", uid, mid).
 		LoadStruct(m)

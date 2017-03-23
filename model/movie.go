@@ -7,14 +7,26 @@ import (
 )
 
 type Movie struct {
+	Id         int64   `json:"id"`
+	Name       string  `json:"name"`
+	Intro      string  `json:"intro"`
+	CategoryId int64   `db:"category_id" json:"categoryId"`
+	PreviewImg string  `db:"preview_img" json:"previewImg"`
+	PlayUrl    string  `db:"play_url" json:"playUrl"`
+	PlayLength int64  `db:"play_length" json:"playLength"`
+	FileSize   int64  `db:"file_size" json:"fileSize"`
+	Tags       string  `json:"tags"`
+	Status     int64     `json:"status"`
+	Uploader   int64   `json:"uploader"`
+	CreateTime int64   `db:"create_time" json:"createTime"`
+	OnlineTime int64   `db:"online_time" json:"onlineTime"`
 	Director   string  `json:"director"`
 	Actor      string  `json:"actor"`
 	Highlight  string  `json:"highlight"`
-	Score      int     `json:"score"`
+	Score      int64     `json:"score"`
 	PlayCount  int64   `db:"play_count" json:"playCount"`
 	ReplyCount int64   `db:"reply_count" json:"replyCount"`
 	ZanCount   int64   `db:"zan_count" json:"zanCount"`
-	MovieForm
 }
 
 type MovieForm struct {
@@ -35,6 +47,14 @@ type MovieForm struct {
 
 func NewMovieForm() *MovieForm {
 	return &MovieForm{
+		Status: 0,
+		CreateTime: time.Now().Unix(),
+		OnlineTime: time.Now().Unix(),
+	}
+}
+
+func NewMovie() *Movie {
+	return &Movie{
 		Status: 0,
 		CreateTime: time.Now().Unix(),
 		OnlineTime: time.Now().Unix(),
@@ -70,7 +90,7 @@ func (m *MovieForm) Update(tx *dbr.Tx) error {
 	return err
 }
 
-func (m *MovieForm) UpdateBy(tx *dbr.Tx, value map[string]interface{}) error {
+func (m *Movie) UpdateBy(tx *dbr.Tx, value map[string]interface{}) error {
 
 	_, err := tx.Update("mv_film").
 		SetMap(value).
@@ -100,7 +120,7 @@ type Movies []Movie
 
 func (m *Movies) LoadByCate(tx *dbr.Tx, cateId int64) error {
 
-	return tx.Select(util.BuildColumnName(m)...).
+	return tx.Select(util.BuildColumnName(&Movie{})...).
 		From("mv_film").
 		Where("category_id = ?", cateId).
 		LoadStruct(m)
@@ -108,8 +128,8 @@ func (m *Movies) LoadByCate(tx *dbr.Tx, cateId int64) error {
 
 func (m *Movies) LoadByFuzzy(tx *dbr.Tx, keyword string) error {
 
-	return tx.Select(util.BuildColumnName(m)...).
+	return tx.Select(util.BuildColumnName(&Movie{})...).
 		From("mv_film").
-		Where("CONCAT(`name`,`tags`) LIKE '%?%'", keyword).
+		Where("CONCAT(`name`,`tags`) LIKE ?", "%" + keyword + "%").
 		LoadStruct(m)
 }

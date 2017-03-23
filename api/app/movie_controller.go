@@ -2,10 +2,7 @@ package app
 
 import (
 	"github.com/labstack/echo"
-	//"github.com/gocraft/dbr"
-	//"github.com/Sirupsen/logrus"
 	"github.com/valyala/fasthttp"
-	//"strconv"
 	"fmt"
 	"strconv"
 	"github.com/gocraft/dbr"
@@ -18,12 +15,12 @@ import (
 func Movie_listByCate() echo.HandlerFunc {
 	return func(c echo.Context) (err error) {
 
-		cateId, _ := strconv.ParseInt(c.QueryParam("cateId"), 10, 64)
+		cateId, _ := strconv.ParseInt(c.QueryParam("cid"), 10, 64)
 		logrus.Debug("根据分类查询电影: ", cateId)
 
 		tx := c.Get("Tx").(*dbr.Tx)
 
-		var movies model.Movies
+		movies :=  new(model.Movies)
 		if err := movies.LoadByCate(tx, cateId); err != nil {
 			logrus.Debug(err)
 			return echo.NewHTTPError(fasthttp.StatusInternalServerError, err.Error())
